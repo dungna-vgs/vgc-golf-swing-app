@@ -1,5 +1,5 @@
 import React from 'react';
-import WarningIcon from '../assets/icons/ic-warning.svg';
+import WarningIcon from '@/assets/icons/ic-warning.svg';
 
 export type Problem = {
   ProblemId: number;

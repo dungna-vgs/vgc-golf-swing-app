@@ -1,6 +1,6 @@
 import React from 'react';
-import SkeletonIcon from '../assets/icons/ic-sekeleton.svg';
-import GuidelineIcon from '../assets/icons/ic-guideline.svg';
+import SkeletonIcon from '@/assets/icons/ic-sekeleton.svg';
+import GuidelineIcon from '@/assets/icons/ic-guideline.svg';
 
 /**
  * Props interface for the Controls component

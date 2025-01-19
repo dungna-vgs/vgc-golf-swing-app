@@ -2,16 +2,16 @@
  * @fileoverview Main application component for Golf Swing Analysis
  */
 
-import React, { useState, useRef, useEffect } from "react";
-import VideoUploader from "./components/VideoUpload.tsx";
-import JsonUploader from "./components/JsonUpload.tsx";
-import ProblemSelector from "./components/ProblemSelector.tsx";
-import SpeedControls from "./components/SpeedControl.tsx";
-import VideoPlayer from "./components/VideoPlayer.tsx";
-import StepButtons from "./components/StepButton.tsx";
-import { GOLF_SWING_STEPS } from "./constants.ts";
-import { processJsonData, handleVideoMetadata } from "./utils/index.tsx";
-import axios from "axios";
+import React, { useState, useRef, useEffect } from 'react';
+import VideoUploader from './components/VideoUpload.tsx';
+import JsonUploader from './components/JsonUpload.tsx';
+import ProblemSelector from './components/ProblemSelector.tsx';
+import SpeedControls from './components/SpeedControl.tsx';
+import VideoPlayer from './components/VideoPlayer.tsx';
+import StepButtons from './components/StepButton.tsx';
+import { GOLF_SWING_STEPS } from './constants.ts';
+import { processJsonData, handleVideoMetadata } from './utils/index.tsx';
+import axios from 'axios';
 
 /**
  * Main application component for Golf Swing Analysis
@@ -63,6 +63,7 @@ const App: React.FC = () => {
    * @param {any} data - The parsed JSON analysis data
    */
   const handleJsonUpload = (data: any) => {
+    console.log('DEBUG:::');
     setJsonData(data);
     if (data.Analysis?.Problems?.length > 0) {
       setSelectedProblem(data.Analysis.Problems[0]);
@@ -105,7 +106,7 @@ const App: React.FC = () => {
 
     updateContainerWidth();
     window.addEventListener('resize', updateContainerWidth);
-    
+
     return () => {
       window.removeEventListener('resize', updateContainerWidth);
     };
@@ -126,19 +127,16 @@ const App: React.FC = () => {
           },
         });
         console.log('fetchVideoData', response);
-        if (!response.status)
-          throw new Error(
-            `Failed to fetch video data! status: ${response.status}`
-          );
+        if (response.status === 200) {
+          const { files } = response.data;
+          if (files?.length > 0) {
+            const videoItem = files.find(
+              (f: any) => f.name === 'video_analysis.mp4'
+            );
 
-        const { files } = response.data;
-        if (files?.length > 0) {
-          const videoItem = files.find(
-            (f: any) => f.name === 'video_analysis.mp4'
-          );
-
-          if (videoItem) {
-            setVideoFile(videoItem.url);
+            if (videoItem) {
+              setVideoFile(videoItem.url);
+            }
           }
         }
       } catch (error) {
@@ -155,16 +153,14 @@ const App: React.FC = () => {
   useEffect(() => {
     if (videoFile && jobId) {
       const fetchAnalysisData = async () => {
-        const response = await axios.get(`/resource/${jobId}/analysis.json`, {
-          headers: { accept: 'application/json' },
-        });
+        const response = await axios.get(
+          `https://files.golffix.dev.vgcorp.vn/${jobId}/analysis.json`,
+          {
+            headers: { accept: 'application/json' },
+          }
+        );
         console.log('fetchAnalysis', response);
-        if (!response.status)
-          throw new Error(
-            `Failed to fetch analysis JSON. Status: ${response.status}`
-          );
-
-        handleJsonUpload(response.data);
+        if (response.status === 200) handleJsonUpload(response.data);
       };
 
       setTimeout(() => fetchAnalysisData(), 200);
