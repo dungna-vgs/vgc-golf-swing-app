@@ -110,8 +110,10 @@ export const mapToScene = (
   videoInfo: { width: number; height: number },
   containerWidth: number
 ) => {
-  const scale = containerWidth / videoInfo.width; // Calculate the scaling factor based on the container width
-  const videoRenderedHeight = videoInfo.height * scale; // Calculate the rendered height of the video
+  const { width, height } = videoInfo;
+  containerWidth = containerWidth > 540 ? width : containerWidth;
+  const scale = containerWidth / width; // Calculate the scaling factor based on the container width
+  const videoRenderedHeight = height * scale; // Calculate the rendered height of the video
 
   return {
     x: point.X * containerWidth, // Map the x-coordinate to the container width

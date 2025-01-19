@@ -1,5 +1,6 @@
-import React from "react";
-import CheckboxWithLabel from "./CheckboxWithLabel.tsx";
+import React from 'react';
+import SkeletonIcon from '../assets/icons/ic-sekeleton.svg';
+import GuidelineIcon from '../assets/icons/ic-guideline.svg';
 
 /**
  * Props interface for the Controls component
@@ -29,17 +30,19 @@ const Controls: React.FC<ControlsProps> = ({
   setShowSkeleton,
 }) => {
   return (
-    <div className="controls">
-      <CheckboxWithLabel
-        label="Show Guidelines"
-        checked={showGuidelines}
-        onChange={() => setShowGuidelines(!showGuidelines)}
-      />
-      <CheckboxWithLabel
-        label="Show Skeleton"
-        checked={showSkeleton}
-        onChange={() => setShowSkeleton(!showSkeleton)}
-      />
+    <div className='controls'>
+      <button
+        className={!showSkeleton ? 'inactive' : ''}
+        onClick={() => setShowSkeleton(!showSkeleton)}
+      >
+        <SkeletonIcon />
+      </button>
+      <button
+        className={!showGuidelines ? 'inactive' : ''}
+        onClick={() => setShowGuidelines(!showGuidelines)}
+      >
+        <GuidelineIcon />
+      </button>
     </div>
   );
 };

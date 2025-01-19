@@ -6,7 +6,6 @@ import React, { useState, useRef, useEffect } from "react";
 import VideoUploader from "./components/VideoUpload.tsx";
 import JsonUploader from "./components/JsonUpload.tsx";
 import ProblemSelector from "./components/ProblemSelector.tsx";
-import Controls from "./components/ControlFrame.tsx";
 import SpeedControls from "./components/SpeedControl.tsx";
 import VideoPlayer from "./components/VideoPlayer.tsx";
 import StepButtons from "./components/StepButton.tsx";
@@ -37,12 +36,6 @@ const App: React.FC = () => {
   const [videoContainerWidth, setVideoContainerWidth] = useState<number>(0);
   /** Currently selected problem from analysis */
   const [selectedProblem, setSelectedProblem] = useState<any>(null);
-  /** Toggle for guidelines visibility */
-  const [showGuidelines, setShowGuidelines] = useState(true);
-  /** Toggle for skeleton visibility */
-  const [showSkeleton, setShowSkeleton] = useState(true);
-  /** Video playback speed */
-  const [speed, setSpeed] = useState(1);
   /** Current step in the golf swing sequence */
   const [currentStep, setCurrentStep] = useState(1);
   /** Reference to the video element */
@@ -107,8 +100,7 @@ const App: React.FC = () => {
    */
   useEffect(() => {
     const updateContainerWidth = () => {
-      const screenWidth = window.innerWidth;
-      setVideoContainerWidth(screenWidth > 540 ? 480 : screenWidth);
+      setVideoContainerWidth(innerWidth - 78);
     };
 
     updateContainerWidth();
@@ -185,21 +177,21 @@ const App: React.FC = () => {
       <div className="file-inputs">
         <VideoUploader onUpload={handleVideoUpload} />
         <JsonUploader onUpload={handleJsonUpload} />
-      </div>
-      {jsonData && (
+      </div> */}
+      {/* {jsonData && (
         <ProblemSelector
           problems={jsonData.Analysis?.Problems}
           onSelect={setSelectedProblem}
           onReset={resetVideoAndStep}
         />
-      )}
-      <Controls
+      )} */}
+      {/* <Controls
         showGuidelines={showGuidelines}
         setShowGuidelines={setShowGuidelines}
         showSkeleton={showSkeleton}
         setShowSkeleton={setShowSkeleton}
-      />
-      <SpeedControls speed={speed} setSpeed={setSpeed} videoRef={videoRef} /> */}
+      /> */}
+      {/* <SpeedControls speed={speed} setSpeed={setSpeed} videoRef={videoRef} /> */}
       {videoFile && (
         <VideoPlayer
           videoFile={videoFile}
@@ -207,18 +199,16 @@ const App: React.FC = () => {
           containerWidth={videoContainerWidth}
           jsonData={jsonData}
           selectedProblem={selectedProblem}
-          showGuidelines={showGuidelines}
-          showSkeleton={showSkeleton}
           setCurrentStep={setCurrentStep}
           videoRef={videoRef}
           onMetadataLoaded={(e) => handleVideoMetadata(e, setVideoInfo)}
         />
       )}
-      <StepButtons
+      {/* <StepButtons
         steps={GOLF_SWING_STEPS}
         currentStep={currentStep}
         onStepClick={handleStepButtonClick}
-      />
+      /> */}
     </div>
   );
 };

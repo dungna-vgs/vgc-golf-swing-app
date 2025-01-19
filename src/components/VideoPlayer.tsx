@@ -7,6 +7,8 @@ import {
   FrameEndType,
 } from '../utils/index.tsx';
 import { initialDegreeGuidelines } from '../helper/data.ts';
+import Controls from './ControlFrame.tsx';
+import SwingProcess from './SwingProcess.tsx';
 
 /**
  * Props interface for VideoPlayer component
@@ -17,8 +19,6 @@ import { initialDegreeGuidelines } from '../helper/data.ts';
  * @property {Function} setCurrentStep - Function to update current step
  * @property {any} jsonData - JSON data containing video analysis
  * @property {any} selectedProblem - Currently selected problem
- * @property {boolean} showGuidelines - Whether to show guidelines
- * @property {boolean} showSkeleton - Whether to show skeleton
  * @property {React.RefObject<HTMLVideoElement | null>} videoRef - Reference to video element
  * @property {Function} onMetadataLoaded - Callback when video metadata is loaded
  */
@@ -29,8 +29,6 @@ interface VideoPlayerProps {
   setCurrentStep: (currentStep: number) => void;
   jsonData: any;
   selectedProblem: any;
-  showGuidelines: boolean;
-  showSkeleton: boolean;
   videoRef: React.RefObject<HTMLVideoElement | null>;
   onMetadataLoaded: (e: React.SyntheticEvent<HTMLVideoElement, Event>) => void;
 }
@@ -49,8 +47,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   setCurrentStep,
   jsonData,
   selectedProblem,
-  showGuidelines,
-  showSkeleton,
   videoRef,
   onMetadataLoaded,
 }) => {
@@ -64,6 +60,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     RotateShoulder: 0,
     SpineDegree: 0,
   });
+  /** Toggle for guidelines visibility */
+  const [showGuidelines, setShowGuidelines] = useState(true);
+  /** Toggle for skeleton visibility */
+  const [showSkeleton, setShowSkeleton] = useState(true);
+  /** Video playback speed */
+  const [speed, setSpeed] = useState(1);
 
   const processFrame = () => {
     if (videoRef && 'current' in videoRef && videoRef.current) {
@@ -170,66 +172,78 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   return (
     <div
-      className='video-container'
-      style={{
-        width: `${videoInfo.width}px`,
-        // height: `${videoInfo.height}px`,
-      }}
+      className='video-wrapper'
+      style={{ width: videoInfo.width + 66 }}
     >
-      <video
-        ref={videoRef}
-        src={videoFile}
-        width='100%'
-        height='100%'
-        onLoadedMetadata={onMetadataLoaded}
-        controls
-        disablePictureInPicture
-        controlsList='nofullscreen'
-        autoPlay
-        playsInline
-        onEnded={() => {
-          if (videoRef.current && jsonData) {
-            const timeStep1 =
-              jsonData.Analysis.Steps[0].FrameIndex / videoInfo.fps;
-            videoRef.current.currentTime = timeStep1;
-            videoRef.current.play();
-          }
-        }}
-        onPlay={handlePlay}
-        onPause={handlePause}
-        onSeeked={handleSeek}
-        muted
-        className='video'
+      <SwingProcess
+        problems={jsonData?.Analysis?.Problems || []}
+        steps={jsonData?.Analysis?.Steps || []}
       />
-
-      <Stage
-        width={videoInfo.width}
-        height={videoInfo.height}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          pointerEvents: 'none',
-          zIndex: 99,
-        }}
+      <Controls
+        showGuidelines={showGuidelines}
+        setShowGuidelines={setShowGuidelines}
+        showSkeleton={showSkeleton}
+        setShowSkeleton={setShowSkeleton}
+      />
+      <div
+        className='video-container'
+        style={{ width: `${videoInfo.width}px` }}
       >
-        <Layer>
-          {showGuidelines &&
-            renderGuidelines(
-              jsonData,
-              selectedProblem,
-              frameIndex,
-              videoInfo,
-              defaultdegreeGuidelines,
-              defaulpointGuidelines,
-              showSkeleton,
-              FrameEnd,
-              containerWidth
-            )}
-          {showSkeleton &&
-            renderSkeleton(jsonData, frameIndex, videoInfo, containerWidth)}
-        </Layer>
-      </Stage>
+        <video
+          ref={videoRef}
+          src={videoFile}
+          width='100%'
+          height='100%'
+          onLoadedMetadata={onMetadataLoaded}
+          controls
+          disablePictureInPicture
+          controlsList='nofullscreen'
+          autoPlay
+          playsInline
+          onEnded={() => {
+            if (videoRef.current && jsonData) {
+              const timeStep1 =
+                jsonData.Analysis.Steps[0].FrameIndex / videoInfo.fps;
+              videoRef.current.currentTime = timeStep1;
+              videoRef.current.play();
+            }
+          }}
+          onPlay={handlePlay}
+          onPause={handlePause}
+          onSeeked={handleSeek}
+          muted
+          className='video'
+        />
+
+        <Stage
+          width={videoInfo.width}
+          height={videoInfo.height}
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            pointerEvents: 'none',
+            zIndex: 99,
+          }}
+        >
+          <Layer>
+            {showGuidelines &&
+              renderGuidelines(
+                jsonData,
+                selectedProblem,
+                frameIndex,
+                videoInfo,
+                defaultdegreeGuidelines,
+                defaulpointGuidelines,
+                showSkeleton,
+                FrameEnd,
+                containerWidth
+              )}
+            {showSkeleton &&
+              renderSkeleton(jsonData, frameIndex, videoInfo, containerWidth)}
+          </Layer>
+        </Stage>
+      </div>
     </div>
   );
 };
