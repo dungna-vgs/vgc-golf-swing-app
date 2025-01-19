@@ -1,18 +1,19 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Stage, Layer } from "react-konva";
+import React, { useRef, useState, useEffect } from 'react';
+import { Stage, Layer } from 'react-konva';
 import {
   mapToScene,
   renderGuidelines,
   renderSkeleton,
-  FrameEndType
-} from "../utils/index.tsx";
-import { initialDegreeGuidelines } from "../helper/data.ts";
+  FrameEndType,
+} from '../utils/index.tsx';
+import { initialDegreeGuidelines } from '../helper/data.ts';
 
 /**
  * Props interface for VideoPlayer component
  * @interface VideoPlayerProps
  * @property {string} videoFile - Path or URL to the video file
  * @property {{ width: number; height: number; fps: number }} videoInfo - Video dimensions and fps
+ * @property {number} containerWidth - The video container's width
  * @property {Function} setCurrentStep - Function to update current step
  * @property {any} jsonData - JSON data containing video analysis
  * @property {any} selectedProblem - Currently selected problem
@@ -24,6 +25,7 @@ import { initialDegreeGuidelines } from "../helper/data.ts";
 interface VideoPlayerProps {
   videoFile: string;
   videoInfo: { width: number; height: number; fps: number };
+  containerWidth: number;
   setCurrentStep: (currentStep: number) => void;
   jsonData: any;
   selectedProblem: any;
@@ -43,6 +45,7 @@ interface VideoPlayerProps {
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
   videoFile,
   videoInfo,
+  containerWidth,
   setCurrentStep,
   jsonData,
   selectedProblem,
@@ -53,9 +56,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 }) => {
   const [frameIndex, setFrameIndex] = useState(0);
   const animationRef = useRef<number | null>(null);
-  const [defaultdegreeGuidelines, setDefaultDegreeGuidelines] = useState(
-    initialDegreeGuidelines
-  );
+  const [defaultdegreeGuidelines] = useState(initialDegreeGuidelines);
   const [defaulpointGuidelines, setDefaulpointGuidelines] = useState<any>(null);
   // const [frameEnd, setFrameEnd] = useState<any>({});
   const [FrameEnd, setFrameEnd] = useState<FrameEndType>({
@@ -65,7 +66,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   });
 
   const processFrame = () => {
-    if (videoRef && "current" in videoRef && videoRef.current) {
+    if (videoRef && 'current' in videoRef && videoRef.current) {
       if (videoRef.current.paused || videoRef.current.ended) {
         if (videoRef.current.ended) {
           setFrameIndex(0);
@@ -129,26 +130,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (videoFile && jsonData) {
       const timeStep1 =
         jsonData?.Analysis?.Steps?.[0]?.FrameIndex / videoInfo?.fps;
-      if (videoRef && "current" in videoRef && videoRef.current) {
+      if (videoRef && 'current' in videoRef && videoRef.current) {
         videoRef.current.currentTime += timeStep1;
       }
       const guidelines = jsonData?.Coordinates?.Guidelines;
       setDefaulpointGuidelines({
         RotateHip: mapToScene(
           guidelines.RotateHip?.[0]?.Guideline?.[0].Points?.[0],
-          videoInfo
+          videoInfo,
+          containerWidth
         ),
         SpineDegree: mapToScene(
           guidelines.SpineDegree?.[0]?.Guideline?.[0].Points?.[0],
-          videoInfo
+          videoInfo,
+          containerWidth
         ),
         RotateShoulder: mapToScene(
           guidelines.RotateShoulder?.[0]?.Guideline?.[0].Points?.[0],
-          videoInfo
+          videoInfo,
+          containerWidth
         ),
         HeadPosition: mapToScene(
           guidelines.HeadPosition?.[0]?.Guideline?.[0].Points?.[0],
-          videoInfo
+          videoInfo,
+          containerWidth
         ),
       });
       const steps = jsonData?.Analysis?.Steps;
@@ -165,7 +170,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   return (
     <div
-      className="video-container"
+      className='video-container'
       style={{
         width: `${videoInfo.width}px`,
         // height: `${videoInfo.height}px`,
@@ -174,10 +179,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       <video
         ref={videoRef}
         src={videoFile}
-        width="100%"
-        height="100%"
+        width='100%'
+        height='100%'
         onLoadedMetadata={onMetadataLoaded}
         controls
+        disablePictureInPicture
+        controlsList='nofullscreen'
+        autoPlay
         playsInline
         onEnded={() => {
           if (videoRef.current && jsonData) {
@@ -191,17 +199,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         onPause={handlePause}
         onSeeked={handleSeek}
         muted
-        className="video"
+        className='video'
       />
 
       <Stage
         width={videoInfo.width}
         height={videoInfo.height}
         style={{
-          position: "absolute",
+          position: 'absolute',
           top: 0,
           left: 0,
-          pointerEvents: "none",
+          pointerEvents: 'none',
           zIndex: 99,
         }}
       >
@@ -215,9 +223,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               defaultdegreeGuidelines,
               defaulpointGuidelines,
               showSkeleton,
-              FrameEnd
+              FrameEnd,
+              containerWidth
             )}
-          {showSkeleton && renderSkeleton(jsonData, frameIndex, videoInfo)}
+          {showSkeleton &&
+            renderSkeleton(jsonData, frameIndex, videoInfo, containerWidth)}
         </Layer>
       </Stage>
     </div>

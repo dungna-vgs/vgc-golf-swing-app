@@ -47,7 +47,7 @@ body {
 .video-analyzer {
   /* max-width: 1200px; */
   margin: 0 auto;
-  padding: 30px;
+  /* padding: 30px; */
   background-color: #ffffff;
   /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); */
   /* border-radius: 8px; */
@@ -156,8 +156,8 @@ body {
   position: relative;
   margin: 0 auto;
   overflow: hidden;
-  border-radius: 8px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  /* border-radius: 10px; */
+  /* box-shadow: 0 0 15px rgba(0, 0, 0, 0.2); */
 }
 
 .video {
@@ -230,7 +230,7 @@ body {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 540px) {
   .video-container {
     max-width: 100%;
   }

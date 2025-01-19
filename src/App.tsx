@@ -12,6 +12,7 @@ import VideoPlayer from "./components/VideoPlayer.tsx";
 import StepButtons from "./components/StepButton.tsx";
 import { GOLF_SWING_STEPS } from "./constants.ts";
 import { processJsonData, handleVideoMetadata } from "./utils/index.tsx";
+import axios from "axios";
 
 /**
  * Main application component for Golf Swing Analysis
@@ -32,6 +33,8 @@ const App: React.FC = () => {
     width: 640,
     height: 480,
   });
+  /** State to store the video container's width */
+  const [videoContainerWidth, setVideoContainerWidth] = useState<number>(0);
   /** Currently selected problem from analysis */
   const [selectedProblem, setSelectedProblem] = useState<any>(null);
   /** Toggle for guidelines visibility */
@@ -99,24 +102,49 @@ const App: React.FC = () => {
     }
   };
 
+  /**
+   * Effect to get screen dimensions
+   */
   useEffect(() => {
-    const fetchVideoData = async () => {
-      if (!jobId) return;
+    const updateContainerWidth = () => {
+      const screenWidth = window.innerWidth;
+      setVideoContainerWidth(screenWidth > 540 ? 480 : screenWidth);
+    };
 
+    updateContainerWidth();
+    window.addEventListener('resize', updateContainerWidth);
+    
+    return () => {
+      window.removeEventListener('resize', updateContainerWidth);
+    };
+  }, []);
+
+  /**
+   * Effect to get video URL
+   */
+  useEffect(() => {
+    if (!jobId) return;
+
+    const fetchVideoData = async () => {
       try {
-        const response = await fetch(`https://api-swing.dev.vgcorp.vn/api/v1/s3/folders/${jobId}`, {
-          method: 'GET',
-          headers: { accept: 'application/json' },
+        const url = `https://api-swing.dev.vgcorp.vn/api/v1/s3/folders/${jobId}`;
+        const response = await axios.get(url, {
+          headers: {
+            Accept: 'application/json',
+          },
         });
         console.log('fetchVideoData', response);
-        
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-  
-        const { files } = data;
+        if (!response.status)
+          throw new Error(
+            `Failed to fetch video data! status: ${response.status}`
+          );
+
+        const { files } = response.data;
         if (files?.length > 0) {
-          const videoItem = files.find((f: any) => f.name === 'video_analysis.mp4');
-          
+          const videoItem = files.find(
+            (f: any) => f.name === 'video_analysis.mp4'
+          );
+
           if (videoItem) {
             setVideoFile(videoItem.url);
           }
@@ -124,23 +152,27 @@ const App: React.FC = () => {
       } catch (error) {
         console.error('Error in fetchVideoData:', error);
       }
-    }
+    };
 
     fetchVideoData();
   }, [jobId]);
 
+  /**
+   * Effect to get analysis data
+   */
   useEffect(() => {
     if (videoFile && jobId) {
       const fetchAnalysisData = async () => {
-        const res = await fetch(`https://files.golffix.dev.vgcorp.vn/${jobId}/analysis.json`, {
-          method: 'GET',
+        const response = await axios.get(`/resource/${jobId}/analysis.json`, {
           headers: { accept: 'application/json' },
         });
-        console.log('fetchAnalysis', res);
-        if (!res.ok) throw new Error(`Failed to fetch analysis JSON. Status: ${res.status}`);
+        console.log('fetchAnalysis', response);
+        if (!response.status)
+          throw new Error(
+            `Failed to fetch analysis JSON. Status: ${response.status}`
+          );
 
-        const analysisData = await res.json();
-        handleJsonUpload(analysisData);
+        handleJsonUpload(response.data);
       };
 
       setTimeout(() => fetchAnalysisData(), 200);
@@ -148,7 +180,7 @@ const App: React.FC = () => {
   }, [videoFile, jobId]);
 
   return (
-    <div className="video-analyzer">
+    <div className='video-analyzer'>
       {/* <h1 className="title">Golf Swing Analysis Demo</h1>
       <div className="file-inputs">
         <VideoUploader onUpload={handleVideoUpload} />
@@ -160,18 +192,19 @@ const App: React.FC = () => {
           onSelect={setSelectedProblem}
           onReset={resetVideoAndStep}
         />
-      )} */}
+      )}
       <Controls
         showGuidelines={showGuidelines}
         setShowGuidelines={setShowGuidelines}
         showSkeleton={showSkeleton}
         setShowSkeleton={setShowSkeleton}
       />
-      <SpeedControls speed={speed} setSpeed={setSpeed} videoRef={videoRef} />
+      <SpeedControls speed={speed} setSpeed={setSpeed} videoRef={videoRef} /> */}
       {videoFile && (
         <VideoPlayer
           videoFile={videoFile}
           videoInfo={videoInfo}
+          containerWidth={videoContainerWidth}
           jsonData={jsonData}
           selectedProblem={selectedProblem}
           showGuidelines={showGuidelines}

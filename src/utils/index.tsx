@@ -102,15 +102,22 @@ export const handleVideoMetadata = (
  * Map coordinates to scene dimensions
  * @param {{ X: number; Y: number }} point - Point coordinates to map
  * @param {{ width: number; height: number }} videoInfo - Video dimensions
+ * @param {number} containerWidth - The width of the video container
  * @returns {{ x: number; y: number }} Mapped coordinates
  */
 export const mapToScene = (
   point: { X: number; Y: number },
-  videoInfo: { width: number; height: number }
-) => ({
-  x: point.X * videoInfo.width,
-  y: point.Y * videoInfo.height,
-});
+  videoInfo: { width: number; height: number },
+  containerWidth: number
+) => {
+  const scale = containerWidth / videoInfo.width; // Calculate the scaling factor based on the container width
+  const videoRenderedHeight = videoInfo.height * scale; // Calculate the rendered height of the video
+
+  return {
+    x: point.X * containerWidth, // Map the x-coordinate to the container width
+    y: point.Y * videoRenderedHeight, // Map the y-coordinate to the rendered height
+  };
+};
 
 /**
  * Render guidelines on the video canvas
@@ -122,6 +129,7 @@ export const mapToScene = (
  * @param {any} defaulpointGuidelines - Default point guidelines
  * @param {boolean} showSkeleton - Whether to show skeleton
  * @param {FrameEndType} [frameEnd] - Frame end timestamps for guidelines
+ * @param {number} containerWidth - The video container's width
  * @returns {React.ReactNode} Rendered guidelines
  */
 export const renderGuidelines = (
@@ -132,7 +140,8 @@ export const renderGuidelines = (
   defaultdegreeGuidelines: any,
   defaulpointGuidelines: any,
   showSkeleton: any,
-  frameEnd?: FrameEndType
+  frameEnd: FrameEndType,
+  containerWidth: number,
 ) => {
   if (!jsonData) return null;
 
@@ -256,7 +265,7 @@ export const renderGuidelines = (
     })
     ?.map((guideline, index) => {
       const renderType = guideline.RenderType;
-      const points = guideline.Points?.map((p) => mapToScene(p, videoInfo));
+      const points = guideline.Points?.map((p) => mapToScene(p, videoInfo, containerWidth));
 
       let lineType = guideline.LineType === 0 ? "round" : [10, 5];
 
@@ -379,7 +388,8 @@ export const renderGuidelines = (
 export const renderSkeleton = (
   jsonData: any,
   frameIndex: number,
-  videoInfo: any
+  videoInfo: any,
+  containerWidth: number,
 ) => {
   if (!jsonData) return null;
 
@@ -390,7 +400,7 @@ export const renderSkeleton = (
 
   return frameData.Guideline.map((guideline: any, index: number) => {
     const renderType = guideline.RenderType;
-    const points = guideline.Points.map((p: any) => mapToScene(p, videoInfo));
+    const points = guideline.Points.map((p: any) => mapToScene(p, videoInfo, containerWidth));
 
     const lineType = guideline.LineType === 0 ? "round" : [10, 5];
     const fillColor =
