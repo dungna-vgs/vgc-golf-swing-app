@@ -1,5 +1,6 @@
 import React from 'react';
 import WarningIcon from '@/assets/icons/ic-warning.svg';
+import { GOLF_SWING_STEPS } from '@/constants';
 
 export type Problem = {
   ProblemId: number;
@@ -12,17 +13,11 @@ export type Problem = {
   Guidelines: string[];
 };
 
-export type Step = {
-  FrameIndex: number;
-  Id: number;
-};
-
 type SwingProcessProps = {
   problems: Problem[];
-  steps: Step[];
 };
 
-const SwingProcess: React.FC<SwingProcessProps> = ({ problems, steps }) => {
+const SwingProcess: React.FC<SwingProcessProps> = ({ problems }) => {
   if (!problems.length) return null;
 
   return (
@@ -41,19 +36,21 @@ const SwingProcess: React.FC<SwingProcessProps> = ({ problems, steps }) => {
         </div>
       </div>
       <div className='swing-process__list'>
-        {steps.map(({ Id }) => {
-          const stepProblems = problems.filter((p) => p.StepId === Id).length;
+        {GOLF_SWING_STEPS.map(({ id, name }) => {
+          const stepProblems = problems.filter((p) => p.StepId === id).length;
           const isMiss = stepProblems === 1;
           const isFail = stepProblems > 1;
 
           return (
             <div
-              key={`${Id}`}
+              key={`${id}`}
               className={`swing-process__step ${
                 isMiss ? 'miss' : isFail ? 'fail' : ''
               }`}
             >
-              <div></div>
+              <div>
+                <p>{name}</p>
+              </div>
               <span>{isMiss ? 'Miss' : isFail ? 'Fail' : 'Pass'}</span>
             </div>
           );

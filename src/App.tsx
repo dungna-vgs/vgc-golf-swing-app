@@ -3,15 +3,15 @@
  */
 
 import React, { useState, useRef, useEffect } from 'react';
+import axios from 'axios';
 import VideoUploader from './components/VideoUpload.tsx';
 import JsonUploader from './components/JsonUpload.tsx';
 import ProblemSelector from './components/ProblemSelector.tsx';
 import SpeedControls from './components/SpeedControl.tsx';
 import VideoPlayer from './components/VideoPlayer.tsx';
 import StepButtons from './components/StepButton.tsx';
-import { GOLF_SWING_STEPS } from './constants.ts';
+import { API_URL, GOLF_SWING_STEPS, RESOURCE_URL } from './constants.ts';
 import { processJsonData, handleVideoMetadata } from './utils/index.tsx';
-import axios from 'axios';
 
 /**
  * Main application component for Golf Swing Analysis
@@ -63,7 +63,6 @@ const App: React.FC = () => {
    * @param {any} data - The parsed JSON analysis data
    */
   const handleJsonUpload = (data: any) => {
-    console.log('DEBUG:::');
     setJsonData(data);
     if (data.Analysis?.Problems?.length > 0) {
       setSelectedProblem(data.Analysis.Problems[0]);
@@ -120,7 +119,7 @@ const App: React.FC = () => {
 
     const fetchVideoData = async () => {
       try {
-        const url = `https://api-swing.dev.vgcorp.vn/api/v1/s3/folders/${jobId}`;
+        const url = `${API_URL}/v1/s3/folders/${jobId}`;
         const response = await axios.get(url, {
           headers: {
             Accept: 'application/json',
@@ -154,7 +153,7 @@ const App: React.FC = () => {
     if (videoFile && jobId) {
       const fetchAnalysisData = async () => {
         const response = await axios.get(
-          `https://files.golffix.dev.vgcorp.vn/${jobId}/analysis.json`,
+          `${RESOURCE_URL}/${jobId}/analysis.json`,
           {
             headers: { accept: 'application/json' },
           }

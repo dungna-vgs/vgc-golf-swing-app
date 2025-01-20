@@ -9,3 +9,12 @@ export const GOLF_SWING_STEPS = [
   { id: 7, name: 'Vung gậy tiếp theo' },
   { id: 8, name: 'Hoàn thành' },
 ];
+
+export const isDevelopment = import.meta.env.MODE === 'development';
+export const APP_URL = import.meta.env.VITE_APP_URL;
+export const API_URL = isDevelopment
+  ? APP_URL + '/api'
+  : import.meta.env.VITE_API_URL;
+export const RESOURCE_URL = isDevelopment
+  ? APP_URL + '/resource'
+  : import.meta.env.VITE_RESOURCE_URL;

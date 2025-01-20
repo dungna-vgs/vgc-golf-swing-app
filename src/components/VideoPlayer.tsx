@@ -9,6 +9,7 @@ import {
 import { initialDegreeGuidelines } from '../helper/data.ts';
 import Controls from './ControlFrame.tsx';
 import SwingProcess from './SwingProcess.tsx';
+import MainProblem from './MainProblem.tsx';
 
 /**
  * Props interface for VideoPlayer component
@@ -175,10 +176,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       className='video-wrapper'
       style={{ width: videoInfo.width + 66 }}
     >
-      <SwingProcess
-        problems={jsonData?.Analysis?.Problems || []}
-        steps={jsonData?.Analysis?.Steps || []}
-      />
+      <MainProblem problems={jsonData?.Analysis?.Problems || []} />
+      <SwingProcess problems={jsonData?.Analysis?.Problems || []} />
       <Controls
         showGuidelines={showGuidelines}
         setShowGuidelines={setShowGuidelines}
@@ -196,8 +195,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           height='100%'
           onLoadedMetadata={onMetadataLoaded}
           controls
-          disablePictureInPicture
           controlsList='nofullscreen'
+          disablePictureInPicture
           autoPlay
           playsInline
           onEnded={() => {
