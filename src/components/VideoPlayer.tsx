@@ -10,6 +10,7 @@ import { initialDegreeGuidelines } from '../helper/data.ts';
 import Controls from './ControlFrame.tsx';
 import SwingProcess from './SwingProcess.tsx';
 import MainProblem from './MainProblem.tsx';
+import ScoreSection from './ScoreSection.tsx';
 
 /**
  * Props interface for VideoPlayer component
@@ -65,8 +66,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [showGuidelines, setShowGuidelines] = useState(true);
   /** Toggle for skeleton visibility */
   const [showSkeleton, setShowSkeleton] = useState(true);
-  /** Video playback speed */
-  const [speed, setSpeed] = useState(1);
 
   const processFrame = () => {
     if (videoRef && 'current' in videoRef && videoRef.current) {
@@ -176,6 +175,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       className='video-wrapper'
       style={{ width: videoInfo.width + 66 }}
     >
+      <ScoreSection analysisScore={jsonData?.Analysis?.Score || 0} />
       <MainProblem problems={jsonData?.Analysis?.Problems || []} />
       <SwingProcess problems={jsonData?.Analysis?.Problems || []} />
       <Controls
@@ -204,7 +204,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               const timeStep1 =
                 jsonData.Analysis.Steps[0].FrameIndex / videoInfo.fps;
               videoRef.current.currentTime = timeStep1;
-              videoRef.current.play();
+              // videoRef.current.play();
             }
           }}
           onPlay={handlePlay}

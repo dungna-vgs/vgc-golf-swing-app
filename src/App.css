@@ -39,7 +39,7 @@
 
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f2f5;
+  background-color: #ccc;
   color: #333;
   line-height: 1.6;
 }
@@ -224,10 +224,72 @@ body {
 
 .video-wrapper {
   position: relative;
+  background-color: #f4f4f4;
   margin: 0 auto;
-  padding-block: 12px;
+  padding-bottom: 12px;
   max-width: 100%;
   min-width: 400px;
+}
+
+/* Score Section */
+.score-section {
+  position: relative;
+  padding: 10px 12px;
+  background: linear-gradient(90deg, #17573C 24.63%, #4AC486 100%);;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.score-section img {
+  position: absolute;
+  right: 12px;
+  bottom: 8px;
+  width: 26px;
+}
+
+.analysis-score {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+}
+
+.analysis-score p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: white;
+  font-weight: bold;
+}
+
+.score-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: white;
+  padding: 8px;
+  aspect-ratio: 1;
+  border-radius: 100%;
+}
+
+.score-container p {
+  margin: 0;
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 16px;
+  color: #868686;
+}
+
+.score-container .gradient-score {
+  background: linear-gradient(90deg, #17573C 24.63%, #4AC486 100%);;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+  font-size: 28px;
+  line-height: 28px;
 }
 
 /* Main Problem */
