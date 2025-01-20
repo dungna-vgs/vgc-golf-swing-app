@@ -47,6 +47,7 @@ body {
 .video-analyzer {
   /* max-width: 1200px; */
   margin: 0 auto;
+  min-height: 100vh;
   /* padding: 30px; */
   /* background-color: #ffffff; */
   /* box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); */
@@ -271,6 +272,7 @@ body {
   justify-content: center;
   align-items: center;
   background-color: white;
+  min-width: 70px;
   padding: 8px;
   aspect-ratio: 1;
   border-radius: 100%;
@@ -356,6 +358,10 @@ body {
   line-height: 16px;
   font-weight: 500;
   color: #CFCFCF;
+}
+
+.main-problem__score span {
+  color: #2ecc71;
 }
 
 /* Swing Process */

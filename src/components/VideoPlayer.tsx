@@ -153,7 +153,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (videoFile && jsonData) {
       const timeStep1 =
         jsonData?.Analysis?.Steps?.[0]?.FrameIndex / videoInfo?.fps;
-      if (videoRef && 'current' in videoRef && videoRef.current) {
+      if (videoRef?.current?.currentTime) {
         videoRef.current.currentTime += timeStep1;
       }
       const guidelines = jsonData?.Coordinates?.Guidelines;

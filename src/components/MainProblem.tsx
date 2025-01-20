@@ -11,15 +11,21 @@ const MainProblem: React.FC<Props> = ({ problems }) => {
 
   useEffect(() => {
     if (problems?.length && !mainProblem) {
-      const maxSeverityProblem = problems.reduce(
-        (maxProblem, currentProblem) => {
-          return currentProblem.Severity > maxProblem.Severity
-            ? currentProblem
-            : maxProblem;
-        }
-      );
+      // Filter out problems with Severity === 0 and find the problem with the highest Severity.
+      // If multiple problems have the same Severity, choose the one with the highest Score.
+      const maxProblem = problems
+        .filter((problem) => problem.Severity !== 0)
+        .reduce((max, current) => {
+          if (
+            current.Severity > max.Severity ||
+            (current.Severity === max.Severity && current.Score > max.Score)
+          ) {
+            return current;
+          }
+          return max;
+        });
 
-      setMainProblem(maxSeverityProblem);
+      setMainProblem(maxProblem);
     }
   }, [problems]);
 
@@ -30,25 +36,20 @@ const MainProblem: React.FC<Props> = ({ problems }) => {
       let color: string;
       let backgroundColor: string;
       switch (Severity) {
-        case 0:
-          label = 'Tạm';
-          color = '#F7941D';
-          backgroundColor = 'rgba(247, 148, 29, 0.4)';
-          break;
-        case 1:
-          label = 'Cần thiết';
-          color = '#F7941D';
-          backgroundColor = 'rgba(247, 148, 29, 0.4)';
-          break;
         case 2:
           label = 'Không tốt';
+          color = '#F7941D';
+          backgroundColor = 'rgba(247, 148, 29, 0.4)';
+          break;
+        case 3:
+          label = 'Lỗi';
           color = '#E64646';
           backgroundColor = 'rgba(230, 70, 70, 0.4)';
           break;
         default:
-          label = 'Lỗi';
-          color = '#E64646';
-          backgroundColor = 'rgba(230, 70, 70, 0.4)';
+          label = 'Tạm';
+          color = '#FCBF4A';
+          backgroundColor = 'rgba(252, 191, 74, 0.4)';
           break;
       }
       return (
@@ -61,14 +62,11 @@ const MainProblem: React.FC<Props> = ({ problems }) => {
             <div className='main-problem__progress'>
               <div
                 className='progress-bar'
-                style={{
-                  width: `${Math.floor(mainProblem.Score)}%`,
-                  backgroundColor: color,
-                }}
+                style={{ width: `${Math.floor(mainProblem.Score)}%` }}
               />
             </div>
             <span className='main-problem__score'>
-              <span style={{ color }}>{mainProblem.Score}</span>/100
+              <span>{mainProblem.Score}</span>/100
             </span>
           </div>
         </>

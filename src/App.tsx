@@ -147,7 +147,7 @@ const App: React.FC = () => {
         if (response.status === 200) handleJsonUpload(response.data);
       };
 
-      setTimeout(() => fetchAnalysisData(), 200);
+      setTimeout(() => fetchAnalysisData(), 500);
     }
   }, [videoFile, jobId]);
 

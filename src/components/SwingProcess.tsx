@@ -51,7 +51,7 @@ const SwingProcess: React.FC<SwingProcessProps> = ({ problems }) => {
               <div>
                 <p>{name}</p>
               </div>
-              <span>{isMiss ? 'Miss' : isFail ? 'Fail' : 'Pass'}</span>
+              <span>{isMiss ? 'Tạm' : isFail ? 'Lỗi' : 'Tốt'}</span>
             </div>
           );
         })}
