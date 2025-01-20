@@ -11,6 +11,9 @@ import Controls from './ControlFrame.tsx';
 import SwingProcess from './SwingProcess.tsx';
 import MainProblem from './MainProblem.tsx';
 import ScoreSection from './ScoreSection.tsx';
+import StepButtons from './StepButton.tsx';
+import { GOLF_SWING_STEPS } from '@/constants.ts';
+import SwingInfo from './SwingInfo.tsx';
 
 /**
  * Props interface for VideoPlayer component
@@ -18,6 +21,7 @@ import ScoreSection from './ScoreSection.tsx';
  * @property {string} videoFile - Path or URL to the video file
  * @property {{ width: number; height: number; fps: number }} videoInfo - Video dimensions and fps
  * @property {number} containerWidth - The video container's width
+ * @property {Function} currentStep - Current step
  * @property {Function} setCurrentStep - Function to update current step
  * @property {any} jsonData - JSON data containing video analysis
  * @property {any} selectedProblem - Currently selected problem
@@ -28,6 +32,7 @@ interface VideoPlayerProps {
   videoFile: string;
   videoInfo: { width: number; height: number; fps: number };
   containerWidth: number;
+  currentStep: number;
   setCurrentStep: (currentStep: number) => void;
   jsonData: any;
   selectedProblem: any;
@@ -46,6 +51,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   videoFile,
   videoInfo,
   containerWidth,
+  currentStep,
   setCurrentStep,
   jsonData,
   selectedProblem,
@@ -128,6 +134,21 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
+  /**
+   * Handles step button clicks to navigate through swing sequence
+   * @param {number} stepId - ID of the selected step
+   */
+  const handleStepButtonClick = (stepId: number) => {
+    if (jsonData && videoRef.current) {
+      const step = jsonData.Analysis.Steps.find((s: any) => s.Id === stepId);
+      if (step) {
+        const frameTime = step.FrameIndex / videoInfo.fps;
+        videoRef.current.currentTime = frameTime;
+        setCurrentStep(stepId);
+      }
+    }
+  };
+
   useEffect(() => {
     if (videoFile && jsonData) {
       const timeStep1 =
@@ -171,78 +192,80 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   }, [jsonData, videoFile, videoInfo]);
 
   return (
-    <div
-      className='video-wrapper'
-      style={{ width: videoInfo.width + 66 }}
-    >
+    <div className='video-wrapper'>
       <ScoreSection analysisScore={jsonData?.Analysis?.Score || 0} />
       <MainProblem problems={jsonData?.Analysis?.Problems || []} />
       <SwingProcess problems={jsonData?.Analysis?.Problems || []} />
-      <Controls
-        showGuidelines={showGuidelines}
-        setShowGuidelines={setShowGuidelines}
-        showSkeleton={showSkeleton}
-        setShowSkeleton={setShowSkeleton}
-      />
-      <div
-        className='video-container'
-        style={{ width: `${videoInfo.width}px` }}
-      >
-        <video
-          ref={videoRef}
-          src={videoFile}
-          width='100%'
-          height='100%'
-          onLoadedMetadata={onMetadataLoaded}
-          controls
-          controlsList='nofullscreen'
-          disablePictureInPicture
-          autoPlay
-          playsInline
-          onEnded={() => {
-            if (videoRef.current && jsonData) {
-              const timeStep1 =
-                jsonData.Analysis.Steps[0].FrameIndex / videoInfo.fps;
-              videoRef.current.currentTime = timeStep1;
-              // videoRef.current.play();
-            }
-          }}
-          onPlay={handlePlay}
-          onPause={handlePause}
-          onSeeked={handleSeek}
-          muted
-          className='video'
+      <div style={{ position: 'relative' }}>
+        <Controls
+          showGuidelines={showGuidelines}
+          setShowGuidelines={setShowGuidelines}
+          showSkeleton={showSkeleton}
+          setShowSkeleton={setShowSkeleton}
         />
+        <div className='video-container'>
+          <video
+            ref={videoRef}
+            src={videoFile}
+            width='100%'
+            height='100%'
+            onLoadedMetadata={onMetadataLoaded}
+            controls
+            controlsList='nofullscreen'
+            disablePictureInPicture
+            autoPlay
+            playsInline
+            onEnded={() => {
+              if (videoRef.current && jsonData) {
+                const timeStep1 =
+                  jsonData.Analysis.Steps[0].FrameIndex / videoInfo.fps;
+                videoRef.current.currentTime = timeStep1;
+                // videoRef.current.play();
+              }
+            }}
+            onPlay={handlePlay}
+            onPause={handlePause}
+            onSeeked={handleSeek}
+            muted
+            className='video'
+          />
 
-        <Stage
-          width={videoInfo.width}
-          height={videoInfo.height}
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            pointerEvents: 'none',
-            zIndex: 99,
-          }}
-        >
-          <Layer>
-            {showGuidelines &&
-              renderGuidelines(
-                jsonData,
-                selectedProblem,
-                frameIndex,
-                videoInfo,
-                defaultdegreeGuidelines,
-                defaulpointGuidelines,
-                showSkeleton,
-                FrameEnd,
-                containerWidth
-              )}
-            {showSkeleton &&
-              renderSkeleton(jsonData, frameIndex, videoInfo, containerWidth)}
-          </Layer>
-        </Stage>
+          <Stage
+            width={videoInfo.width}
+            height={videoInfo.height}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              pointerEvents: 'none',
+              zIndex: 99,
+            }}
+          >
+            <Layer>
+              {showGuidelines &&
+                renderGuidelines(
+                  jsonData,
+                  selectedProblem,
+                  frameIndex,
+                  videoInfo,
+                  defaultdegreeGuidelines,
+                  defaulpointGuidelines,
+                  showSkeleton,
+                  FrameEnd,
+                  containerWidth
+                )}
+              {showSkeleton &&
+                renderSkeleton(jsonData, frameIndex, videoInfo, containerWidth)}
+            </Layer>
+          </Stage>
+        </div>
       </div>
+      <StepButtons
+        steps={GOLF_SWING_STEPS}
+        currentStep={currentStep}
+        onStepClick={handleStepButtonClick}
+      />
+      <SwingInfo record={jsonData?.Context?.Record || null} />
     </div>
   );
 };

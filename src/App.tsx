@@ -70,21 +70,6 @@ const App: React.FC = () => {
   };
 
   /**
-   * Handles step button clicks to navigate through swing sequence
-   * @param {number} stepId - ID of the selected step
-   */
-  const handleStepButtonClick = (stepId: number) => {
-    if (jsonData && videoRef.current) {
-      const step = jsonData.Analysis.Steps.find((s: any) => s.Id === stepId);
-      if (step) {
-        const frameTime = step.FrameIndex / videoInfo.fps;
-        videoRef.current.currentTime = frameTime;
-        setCurrentStep(stepId);
-      }
-    }
-  };
-
-  /**
    * Resets video to first step
    */
   const resetVideoAndStep = () => {
@@ -194,6 +179,7 @@ const App: React.FC = () => {
           containerWidth={videoContainerWidth}
           jsonData={jsonData}
           selectedProblem={selectedProblem}
+          currentStep={currentStep}
           setCurrentStep={setCurrentStep}
           videoRef={videoRef}
           onMetadataLoaded={(e) => handleVideoMetadata(e, setVideoInfo)}
